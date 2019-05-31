@@ -17,35 +17,8 @@ def restore_rvdata2(list)
 	return unless list.has_key?("json_class")
 	obj = nil
 	case list["json_class"]
-		when "Color"
-			obj = Color.new([0,0,0,0])
-		when "Table"
-			obj = Table.new([1,1,0,0,1,[]])
-		when "Tone"
-			obj = Tone.new([0,0,0,0])
-		when "RPG::Event"
-			obj = RPG::Event.new(list["@x"], list["@y"])
-		when "RPG::EventCommand"
-			obj = RPG::EventCommand.new(list["@code"], list["@indent"], list["@parameters"])
-		when "RPG::MoveCommand"
-			obj = RPG::MoveCommand.new(list["@code"], list["@parameters"])
-		when "RPG::BaseItem::Feature"
-			obj = RPG::BaseItem::Feature.new(list["@code"], list["@data_id"], list["@value"])
-		when "RPG::UsableItem::Effect"
-			obj = RPG::UsableItem::Effect.new(list["@code"], list["@data_id"], list["@value1"], list["@value2"])
 		when "RPG::Map"
 			obj = RPG::Map.new(list["@width"], list["@height"])
-		when "RPG::BGM"
-			obj = RPG::BGM.new(list["@name"], list["@volume"], list["@pitch"])
-		when "RPG::BGS"
-			obj = RPG::BGS.new(list["@name"], list["@volume"], list["@pitch"])
-		when "RPG::ME"
-			obj = RPG::ME.new(list["@name"], list["@volume"], list["@pitch"])
-		when "RPG::SE"
-			obj = RPG::SE.new(list["@name"], list["@volume"], list["@pitch"])
-		else
-			str = "obj=" + list["json_class"] + ".new"
-			eval(str)
 	end
 	iterate_setting_value(obj, list)
 	return obj
@@ -79,22 +52,7 @@ def iterate_setting_value(target, list)
 end
 
 [
-  'Data/Actors.json',
-  'Data/Animations.json',
-#  'Data/Areas.json',
-  'Data/Armors.json',
-  'Data/Classes.json',
-  'Data/CommonEvents.json',
-  'Data/Enemies.json',
-  'Data/Items.json',
   *Dir.glob('Data/Map[0-9][0-9][0-9].json'),
-  'Data/MapInfos.json',
-  'Data/Skills.json',
-  'Data/States.json',
-  'Data/System.json',
-  'Data/Tilesets.json',
-  'Data/Troops.json',
-  'Data/Weapons.json'
 ].each do |json|
   text = ''
   p json
