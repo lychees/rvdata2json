@@ -1,0 +1,1 @@
+[null,{"json_class":"RPG::Weapon","@description":"","@name":"","@icon_index":0,"@price":0,"@animation_id":0,"@note":"","@id":1,"@features":[{"json_class":"RPG::BaseItem::Feature","@code":31,"@data_id":1,"@value":0},{"json_class":"RPG::BaseItem::Feature","@code":22,"@data_id":0,"@value":0}],"@params":[0,0,0,0,0,0,0,0],"@etype_id":0,"@wtype_id":0}]
