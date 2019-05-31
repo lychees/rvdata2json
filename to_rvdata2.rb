@@ -14,11 +14,38 @@ require_relative 'rgss3'
 
 #追加メソッド
 def restore_rvdata2(list)
-	return unless list.has_key?("json_class")
+	return unless (list.respond_to?("has_key?") and list.has_key?("json_class"))
 	obj = nil
 	case list["json_class"]
+		when "Color"
+			obj = Color.new([0,0,0,0])
+		when "Table"
+			obj = Table.new([1,1,0,0,1,[]])
+		when "Tone"
+			obj = Tone.new([0,0,0,0])
+		when "RPG::Event"
+			obj = RPG::Event.new(list["@x"], list["@y"])
+		when "RPG::EventCommand"
+			obj = RPG::EventCommand.new(list["@code"], list["@indent"], list["@parameters"])
+		when "RPG::MoveCommand"
+			obj = RPG::MoveCommand.new(list["@code"], list["@parameters"])
+		when "RPG::BaseItem::Feature"
+			obj = RPG::BaseItem::Feature.new(list["@code"], list["@data_id"], list["@value"])
+		when "RPG::UsableItem::Effect"
+			obj = RPG::UsableItem::Effect.new(list["@code"], list["@data_id"], list["@value1"], list["@value2"])
 		when "RPG::Map"
 			obj = RPG::Map.new(list["@width"], list["@height"])
+		when "RPG::BGM"
+			obj = RPG::BGM.new(list["@name"], list["@volume"], list["@pitch"])
+		when "RPG::BGS"
+			obj = RPG::BGS.new(list["@name"], list["@volume"], list["@pitch"])
+		when "RPG::ME"
+			obj = RPG::ME.new(list["@name"], list["@volume"], list["@pitch"])
+		when "RPG::SE"
+			obj = RPG::SE.new(list["@name"], list["@volume"], list["@pitch"])
+		else
+			str = "obj=" + list["json_class"] + ".new"
+			eval(str)
 	end
 	iterate_setting_value(obj, list)
 	return obj
