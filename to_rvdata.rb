@@ -1,19 +1,15 @@
 # coding: utf-8
+# to_rvdata.rb
+# author: dice2000
+# original author: aoitaku
+# https://gist.github.com/aoitaku/7822424
+#
+# Area.rvdata, Scripts.rvdata未対応
 require 'jsonable'
 require 'zlib'
-require_relative 'rgss3'
+require_relative 'rgss2'
 
-#2015/6/27
-#制限事項：Areas.rvdata2とScripts.rvdata2に未対応
-
-#↓解決済（2015/6/27）
-# 既存の不具合/15.6.18
-# このスクリプトで復帰させると、以降エディタ上にイベントが表示されない
-# （新規作成含む）
-# イベント自体は動く
-
-#追加メソッド
-def restore_rvdata2(list)
+def restore_rvdata(list)
 	return unless (list.respond_to?("has_key?") and list.has_key?("json_class"))
 	obj = nil
 	case list["json_class"]
@@ -29,10 +25,10 @@ def restore_rvdata2(list)
 			obj = RPG::EventCommand.new(list["@code"], list["@indent"], list["@parameters"])
 		when "RPG::MoveCommand"
 			obj = RPG::MoveCommand.new(list["@code"], list["@parameters"])
-		when "RPG::BaseItem::Feature"
-			obj = RPG::BaseItem::Feature.new(list["@code"], list["@data_id"], list["@value"])
-		when "RPG::UsableItem::Effect"
-			obj = RPG::UsableItem::Effect.new(list["@code"], list["@data_id"], list["@value1"], list["@value2"])
+#		when "RPG::BaseItem::Feature"
+#			obj = RPG::BaseItem::Feature.new(list["@code"], list["@data_id"], list["@value"])
+#		when "RPG::UsableItem::Effect"
+#			obj = RPG::UsableItem::Effect.new(list["@code"], list["@data_id"], list["@value1"], list["@value2"])
 		when "RPG::Map"
 			obj = RPG::Map.new(list["@width"], list["@height"])
 		when "RPG::BGM"
@@ -57,19 +53,16 @@ def iterate_setting_value(target, list)
 		#マップイベントデータの場合
 		if d == :@events
 			list[d.to_s].each{|k, v|
-				target.events[k.to_i] = restore_rvdata2(v)
+				target.events[k.to_i] = restore_rvdata(v)
 			}
-			#target.events.each_key{|key|
-			#	p key
-			#}
 		# 値がクラスオブジェクト
 		elsif list[d.to_s].is_a?(Hash)
-			target.instance_variable_set(d, restore_rvdata2(list[d.to_s]))
+			target.instance_variable_set(d, restore_rvdata(list[d.to_s]))
 		# 値がクラスオブジェクトの配列
 		elsif list[d.to_s].is_a?(Array) && list[d.to_s][0].is_a?(Hash)
 			data_trans = []
 			list[d.to_s].each{|d|
-				data_trans << restore_rvdata2(d)
+				data_trans << restore_rvdata(d)
     	}
     	target.instance_variable_set(d, data_trans)
 		else
@@ -77,6 +70,7 @@ def iterate_setting_value(target, list)
 		end
 	}
 end
+
 
 [
   *Dir.glob('Data/Map[0-9][0-9][0-9].json')
@@ -95,7 +89,7 @@ end
     	if d == nil
     		data_trans << d
     	else
-    		data_trans << restore_rvdata2(d)
+    		data_trans << restore_rvdata(d)
     	end
     }
   #あまり賢くない方法で対処（後で考える）
@@ -103,16 +97,16 @@ end
 	  if json == 'Data/MapInfos.json'
 	  	data_trans = {}
 	  	data.each{|k, v|
-	  		data_trans[k.to_i] = restore_rvdata2(v)
+	  		data_trans[k.to_i] = restore_rvdata(v)
 	  	}
 	  else
-	  	data_trans = restore_rvdata2(data)
+	  	data_trans = restore_rvdata(data)
 	  end
 	else
-		data_trans = restore_rvdata2(data)
+		data_trans = restore_rvdata(data)
   end
   #p data_trans
-  File.open('Data/'+File.basename(json,'.json')+'.rvdata2', 'wb') do |file|
+  File.open('Data/'+File.basename(json,'.json')+'.rvdata', 'wb') do |file|
     file.write(Marshal.dump(data_trans))
   end
   f.close
